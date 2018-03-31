@@ -4,8 +4,9 @@ build_and_push.sh
 startenv*
 /http
 peewee.db
-.env
 *.sqlite3
+/.env
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
