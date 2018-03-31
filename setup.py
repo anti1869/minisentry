@@ -25,6 +25,7 @@ test_requirements = [
 
 develop_requirements = [
     "colorlog",
+    "django-silk",
 ]
 
 setup(

@@ -1,6 +1,7 @@
 import os
 
 from dotenv import load_dotenv
+import silk
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,7 +42,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -124,3 +125,51 @@ STATICFILES_FINDERS = (
 # STATICFILES_DIRS = (
 #     os.path.join(ROOT_DIR, 'static/'),
 # )
+
+
+# Logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
+        },
+        "simple": {
+            "format": "%(levelname)s %(asctime)s %(name)s %(message)s",
+            'datefmt': "%d.%m.%Y %H:%M:%S",
+        },
+        "colored": {
+            "()": "colorlog.ColoredFormatter",
+            "format":
+                "%(log_color)s%(levelname)-8s%(reset)s %(blue)s[%(asctime)s %(name)s:%(lineno)s] "
+                "%(white)s%(message)s",
+            "datefmt": "%H:%M:%S",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": os.environ.get("LOGGING_CONSOLE_FORMATTER", "simple")
+        }
+    },
+    "loggers": {
+        "django.db.backends": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+    },
+}
+
+
+USE_SILK = os.environ.get("USE_SILK", "False") == "True"
+if DEBUG and USE_SILK:
+    INSTALLED_APPS += ["silk", ]
+    MIDDLEWARE += ["silk.middleware.SilkyMiddleware", ]
+
