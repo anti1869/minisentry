@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import logging
 import json
 import uuid
@@ -84,3 +85,8 @@ def safely_load_json_string(json_string):
 
 def convert_to_json(obj):
     return json.dumps(obj, cls=DjangoJSONEncoder)
+
+
+def hash_string(string) -> str:
+    # TODO: Make it faster
+    return hashlib.md5(string.encode()).hexdigest()

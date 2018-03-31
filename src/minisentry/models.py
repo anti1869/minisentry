@@ -1,13 +1,13 @@
 from django.db import models
 
-from minisentry.helpers import gen_secret
+from minisentry.helpers import gen_secret, safely_load_json_string, decompress_deflate
 
 
 class Event(models.Model):
     """
     An individual event.
     """
-    group_id = models.BigIntegerField(blank=True, null=True, db_index=True)
+    group_id = models.CharField(max_length=32, null=True, db_index=True)
     event_id = models.CharField(max_length=32)
     project_id = models.IntegerField()
     message = models.TextField()
@@ -20,6 +20,15 @@ class Event(models.Model):
     class Meta:
         unique_together = (('project_id', 'event_id'),)
         index_together = (('group_id', 'timestamp'),)
+
+    @property
+    def decoded_data(self):
+        if not hasattr(self, "_decoded_data"):
+            setattr(
+                self, "_decoded_data",
+                safely_load_json_string(decompress_deflate(self.data))
+            )
+        return getattr(self, "_decoded_data")
 
 
 class Project(models.Model):

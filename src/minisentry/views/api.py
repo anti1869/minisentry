@@ -1,4 +1,6 @@
+import json
 import logging
+from copy import deepcopy
 from typing import Dict, Optional
 
 from django.http import JsonResponse, HttpResponseForbidden
@@ -10,7 +12,6 @@ from minisentry.models import Event, Project
 
 logger = logging.getLogger(__name__)
 
-from django.conf import settings
 
 @require_POST
 def store(request, project_id):
@@ -60,17 +61,17 @@ def _get_project_id_from_auth(auth_header: str, requested_id: int) -> Optional[i
     """
     Returns same project id as requested, if all checks are ok, otherwise - None
     """
-    auth_data = {
-        key.strip(): value
-        for key, value in map(lambda x: x.split("="), auth_header.split(","))
-    }
     try:
+        auth_data = {
+            key.strip(): value
+            for key, value in map(lambda x: x.split("="), auth_header.split(","))
+        }
         project_id = Project.objects.filter(
             key=auth_data["sentry_key"],
             secret=auth_data["sentry_secret"],
             pk=requested_id,
         ).values_list("pk", flat=True).first()
-    except KeyError:
+    except (KeyError, AttributeError):
         logger.error("Wrong auth header")
         return
 
@@ -78,11 +79,28 @@ def _get_project_id_from_auth(auth_header: str, requested_id: int) -> Optional[i
 
 
 def _save_event(data: Dict, project_id: int):
+    """Save event to database"""
     kwargs = {
         name: data[name]
         for name in ("event_id", "message", "level", "platform", "timestamp", "time_spent")
     }
     kwargs["project_id"] = project_id
     kwargs["data"] = helpers.compress_deflate(helpers.convert_to_json(data))
+    kwargs["group_id"] = _get_group_id(data, project_id)
     Event.objects.create(**kwargs)
 
+
+def _get_group_id(data: Dict, project_id) -> Optional[str]:
+    """Generate group_id to group same events"""
+    # TODO: Slow as hell. Make it faster
+    # TODO: Not tested at all, have no idea if it works.
+    try:
+        exc = deepcopy(data["exception"])
+        for value in exc["values"]:
+            for frame in value["stacktrace"]["frames"]:
+                frame.pop("vars")
+        exception = json.dumps({"e": exc, "pid": project_id}, sort_keys=True)
+    except (KeyError, ValueError):
+        logger.error("Can't serialize exception", exc_info=True)
+        return
+    return helpers.hash_string(exception)
