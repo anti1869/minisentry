@@ -11,10 +11,15 @@ class Event(models.Model):
     event_id = models.CharField(max_length=32)
     project_id = models.IntegerField()
     message = models.TextField()
+    level = models.IntegerField(null=True)
     platform = models.CharField(max_length=64, null=True)
-    datetime = models.DateTimeField(auto_now_add=True, db_index=True)
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
     time_spent = models.IntegerField(null=True)
     data = models.BinaryField()
+
+    class Meta:
+        unique_together = (('project_id', 'event_id'),)
+        index_together = (('group_id', 'timestamp'),)
 
 
 class Project(models.Model):

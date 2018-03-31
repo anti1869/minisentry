@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.urls import path
 
-from minisentry.views import auth, coreapi, events, projects
+from minisentry.views import auth, api, events, projects
 
 
 urlpatterns = [
@@ -13,7 +13,7 @@ urlpatterns = [
     path("sentry/<project_id>/", projects.ProjectView.as_view(), name="project"),
     path("sentry/<project_id>/events/", events.EventsListView.as_view(), name="events-list"),
     path("sentry/<project_id>/events/<event_id>/", events.EventView.as_view(), name="events"),
-    path("api/<project_id>/store/", coreapi.store, name="store"),
+    path("api/<project_id>/store/", api.store, name="store"),
 ]
 
 if settings.USE_SILK:
