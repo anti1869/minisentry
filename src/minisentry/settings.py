@@ -117,14 +117,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(ROOT_DIR, 'static')
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
-# STATICFILES_DIRS = (
-#     os.path.join(ROOT_DIR, 'static/'),
-# )
 
 
 # Logging
@@ -167,6 +163,9 @@ LOGGING = {
     },
 }
 
+
+LOGIN_URL = "/signin/"
+LOGIN_REDIRECT_URL = "/sentry/"
 
 USE_SILK = os.environ.get("USE_SILK", "False") == "True"
 if DEBUG and USE_SILK:

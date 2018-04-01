@@ -7,9 +7,11 @@ from minisentry.views import auth, api, events, projects
 
 
 urlpatterns = [
-    path("", auth.mainpage, name="mainpage"),
+    path("", projects.mainpage, name="mainpage"),
     path("admin/", admin.site.urls),
-    path("sentry/", projects.ProjectsListView.as_view(), name="projects-list"),
+    path("signin/", auth.SignInView.as_view(), name="signin"),
+    path("signout/", auth.SignOutView.as_view(), name="signout"),
+    path("sentry/", projects.DashboardView.as_view(), name="dashboard"),
     path("sentry/<project_id>/", projects.ProjectView.as_view(), name="project"),
     path("sentry/<project_id>/events/", events.EventsListView.as_view(), name="events-list"),
     path("sentry/<project_id>/events/<event_id>/", events.EventView.as_view(), name="events"),

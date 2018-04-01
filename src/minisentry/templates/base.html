@@ -1,0 +1,50 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'minisentry/css/bootstrap.min.css' %}" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+  {% block body %}
+    {# Header #}
+    <nav class="navbar navbar-expand-sm navbar-light mb-3" style="background-color: #e3f2fd;">
+      <a class="navbar-brand" href="/">MiniSentry</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'signout' %}">Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    {# Content #}
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-9">
+          {% block content %}
+
+          {% endblock %}
+        </div>
+        <div class="col-sm-3">
+          {% block additional_tab %}
+
+          {% endblock %}
+        </div>
+    </div>
+  {% endblock %}
+  <script src="{% static 'minisentry/js/jquery-3.2.1.slim.min.js' %}"></script>
+  <script src="{% static 'minisentry/js/popper-1.12.9.min.js' %}"></script>
+  <script src="{% static 'minisentry/js/bootstrap.min.js' %}"></script>
+</body>
+</html>
