@@ -3,6 +3,21 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-  Проекты
-  {{ projects_menu }}
+  <h1>Projects</h1>
+  <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col" width="100%">Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in projects_menu %}
+      <tr>
+        <th scope="row">{{ item.id }}</th>
+        <td><a href="{{ item.url }}">{{ item.title }}</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  </table>
 {% endblock %}
