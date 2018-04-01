@@ -37,3 +37,22 @@ class GroupsListView(BaseView):
 
 class GroupView(BaseView):
     template_name = "group.html"
+
+    def get_context_data(self, **kwargs):
+        try:
+            project = Project.objects.get(pk=self.kwargs["project_id"])
+            group = Group.objects.get(long_id=kwargs["group_id"], project=project)
+        except (Project.DoesNotExist, Group.DoesNotExist):
+            return HttpResponseNotFound()
+
+        event = group.get_last_event()
+
+        data = super().get_context_data(**kwargs)
+        data.update({
+            "selected_project": project,
+            "group": group,
+            "event": event,
+            "data": event.decoded_data,
+        })
+        return data
+

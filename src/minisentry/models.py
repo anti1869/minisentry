@@ -3,7 +3,7 @@ from enum import Enum
 
 from django.db import models
 
-from minisentry.constants import LOG_LEVELS
+from minisentry.constants import LOG_LEVELS, LEVEL_LABELS
 from minisentry.helpers import (
     choices_from_enum, gen_secret, safely_load_json_string, decompress_deflate
 )
@@ -42,7 +42,18 @@ class Project(models.Model):
         return f"id={self.pk}, {self.title}"
 
 
-class Group(models.Model):
+class EventFeaturesMixin(object):
+
+    @property
+    def level_label(self):
+        return LEVEL_LABELS.get(getattr(self, "level"), LEVEL_LABELS[logging.NOTSET])
+
+    @property
+    def level_title(self):
+        return LOG_LEVELS.get(getattr(self, "level"), "")
+
+
+class Group(EventFeaturesMixin, models.Model):
     """
     Aggregated message which summarizes a set of Events.
     """
@@ -67,11 +78,11 @@ class Group(models.Model):
         index_together = (("project", "last_seen"), )
         ordering = ["-last_seen"]
         
-    def last_event(self) -> "Event":
+    def get_last_event(self) -> "Event":
         return self.event_set.latest("timestamp")
 
 
-class Event(models.Model):
+class Event(EventFeaturesMixin, models.Model):
     """
     An individual event.
     """

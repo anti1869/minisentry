@@ -1,0 +1,17 @@
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">Projects</h5>
+    <ul>
+      {% for item in projects_menu %}
+        <li>
+          {% if item.hit %}
+            <span class="text-muted">{{ item.title }}</span>
+          {% else %}
+            <a href="{{ item.url }}">{{ item.title }}</a>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
