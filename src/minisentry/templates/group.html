@@ -11,38 +11,63 @@
 {% block content %}
   <p class="lead"><span class="mr-2 badge badge-{{ event.level_label }}">{{ event.level_title }}</span> {{ event.message }}</p>
 
-  <div class="card mb-3">
-    <div class="card-body">
-      <ul class="list-unstyled">
-        <li><b>Last seen</b>: {{ group.last_seen|date:"d E Y, H:i:s" }}</li>
-        <li>First seen: {{ group.first_seen|date:"d E Y, H:i:s" }}</li>
-        <li>Times seen: {{ group.times_seen }}</li>
-        <li><small>Group ID: {{ group.long_id }}</small></li>
-        <li><small>Event ID: {{ event.event_id }}</small></li>
-      </ul>
-    </div>
-  </div>
-
-  <h2>Stacktrace:</h2>
+  <h2>Traceback</h2>
   {% for value in data.exception.values %}
+    <div class="list-group mb-4">
     {% for frame in value.stacktrace.frames %}
-        {% for title, values in frame.items %}
-            {% if title == "pre_context" %}
-              <h4>Context</h4>
-            {% endif %}
-            {% if title == "pre_context" or title == "post_context" %}
-              {% for line in values %}<code style="background-color: #dddddd">{{ line }}</code><br />{% endfor %}
-            {% elif title == "context_line" %}
-              <pre><code class="bg-dark text-light">{{ values }}</code></pre>
-            {% else %}
-              <h4>{{ title }}</h4>
-              <div class="mb-2"><code>{{ values }}</code></div>
-            {% endif %}
-        {% endfor %}
+        <div class="list-group-item">
+          <div class="d-flex">
+            <div class=""><div><small><b>{{ frame.filename }}</b> in <b>{{ frame.function }}</b> at line <b>{{ frame.lineno }}</b></small></div></div>
+            <div class="ml-auto"><button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#framecontents-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseExample">+</button></div>
+          </div>
+          <div class="collapse{% if frame.in_app or value.stacktrace.frames|length == 1 %}.show{% endif %}" id="framecontents-{{ forloop.counter }}">
+            <pre><code>{{ frame.pre_context|join:"<br />" }}</code><br /><code class="bg-primary text-light">{{ frame.context_line }}</code><br /><code>{{ frame.post_context|join:"<br />" }}</code></pre>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#localvars-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseExample">Local vars</button>
+            <div class="mt-3 collapse" id="localvars-{{ forloop.counter }}">
+              <small>
+                <table class="table">
+                <tbody>
+                  {% for var, values in frame.vars.items %}
+                    <tr>
+                      <th scope="row">{{ var }}</th>
+                      <td><code>{{ values }}</code></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                </table>
+              </small>
+            </div>
+          </div>
+        </div>
     {% endfor %}
+    </div>
   {% endfor %}
+
+  {% include "include/table_from_dict.html" with title="Extra" values_dict=data.extra only %}
+  {% include "include/table_from_dict.html" with title="Modules" values_dict=data.modules only %}
+  {% include "include/table_from_dict.html" with title="SDK" values_dict=data.sdk only %}
+
 {% endblock %}
 
 {% block additional_tab %}
-  {% include "include/projects_menu.html" %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <dl>
+        <dt>Last seen</dt>
+        <dd>{{ group.last_seen|date:"d E Y, H:i:s" }}</dd>
+        <dt>First seen</dt>
+        <dd>{{ group.first_seen|date:"d E Y, H:i:s" }}</dd>
+        <dt>Times seen</dt>
+        <dd>{{ group.times_seen }}</dd>
+        <dt>Server name</dt>
+        <dd>{{ data.server_name }}</dd>
+        <dt><small>Platform</small></dt>
+        <dd><small>{{ data.platform }}</small></dd>
+        <dt><small>Group ID</small></dt>
+        <dd><small>{{ group.long_id }}</small></dd>
+        <dt><small>Event ID</small></dt>
+        <dd><small>{{ event.event_id }}</small></dd>
+      </dl>
+    </div>
+  </div>
 {% endblock %}

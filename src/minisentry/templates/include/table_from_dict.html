@@ -1,0 +1,11 @@
+<h2>{{ title }}</h2>
+<table class="table">
+<tbody>
+  {% for var, values in values_dict.items %}
+    <tr>
+      <th scope="row">{{ var }}</th>
+      <td><code>{{ values }}</code></td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
