@@ -18,12 +18,24 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
+          <li class="nav-item">
             <a class="nav-link" href="{% url 'dashboard' %}">Dashboard <span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'signout' %}">Sign Out</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="projectsMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Projects
+            </a>
+            <div class="dropdown-menu" aria-labelledby="projectsMenuLink">
+              {% for item in projects_menu %}
+                <a class="dropdown-item {% if item.hit %}active{% endif %}" href="{{ item.url }}">{{ item.title }}</a>
+              {% endfor %}
+            </div>
           </li>
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'signout' %}">Sign Out {{ user }}</a>
+            </li>
+          {% endif %}
         </ul>
       </div>
     </nav>
