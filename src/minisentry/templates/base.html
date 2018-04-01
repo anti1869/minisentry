@@ -31,9 +31,12 @@
               {% endfor %}
             </div>
           </li>
+        </ul>
+        <ul class="navbar-nav">
           {% if user.is_authenticated %}
+            <li class="nav-item"><span class="navbar-text mr-2">{{ user }}</span></li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'signout' %}">Sign Out {{ user }}</a>
+              <a class="nav-link" href="{% url 'signout' %}">Sign Out</a>
             </li>
           {% endif %}
         </ul>
