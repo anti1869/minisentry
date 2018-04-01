@@ -5,9 +5,10 @@ from typing import Dict, Optional
 
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
+from django.db.models import F
 
 from minisentry import helpers
-from minisentry.models import Event, Project
+from minisentry.models import Event, Group, Project, GroupStatus
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,8 @@ def store(request, project_id):
 
     content_encoding = request.META.get("HTTP_CONTENT_ENCODING")
     data = _decode_data(request.body, content_encoding)
-    _save_event(data, project_id)
+    group = _save_group(data, project_id)
+    _save_event(data, project_id, group)
     logger.info("Event saved")
 
     result = {"id": data.get("event_id")}
@@ -78,7 +80,30 @@ def _get_project_id_from_auth(auth_header: str, requested_id: int) -> Optional[i
     return project_id
 
 
-def _save_event(data: Dict, project_id: int):
+def _save_group(data: Dict, project_id: int) -> str:
+    """Save event group to database and return long_id of the group"""
+    long_id = _get_group_id(data, project_id)
+    updated = (
+        Group.objects
+        .filter(long_id=long_id, project=project_id)
+        .update(
+            last_seen=data["timestamp"],
+            times_seen=F("times_seen") + 1,
+            status=GroupStatus.UNRESOLVED.value,
+        )
+    )
+    if not updated:
+        Group.objects.create(
+            long_id=long_id,
+            project_id=project_id,
+            level=data["level"],
+            message=data["message"],
+            platform=data["platform"],
+        )
+    return long_id
+
+
+def _save_event(data: Dict, project_id: int, group_id: str):
     """Save event to database"""
     kwargs = {
         name: data[name]
@@ -86,7 +111,7 @@ def _save_event(data: Dict, project_id: int):
     }
     kwargs["project_id"] = project_id
     kwargs["data"] = helpers.compress_deflate(helpers.convert_to_json(data))
-    kwargs["group_id"] = _get_group_id(data, project_id)
+    kwargs["group_id"] = group_id
     Event.objects.create(**kwargs)
 
 

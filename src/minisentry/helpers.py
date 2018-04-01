@@ -6,6 +6,7 @@ import uuid
 import zlib
 from gzip import GzipFile
 from io import BytesIO
+from typing import Tuple
 
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -90,3 +91,15 @@ def convert_to_json(obj):
 def hash_string(string) -> str:
     # TODO: Make it faster
     return hashlib.md5(string.encode()).hexdigest()
+
+
+def choices_from_enum(source: type) -> Tuple[Tuple[int, str], ...]:
+    """
+    Makes tuple to use in Django's Fields ``choices`` attribute.
+    Enum members names will be titles for the choices.
+
+    :param source: Enum to process.
+    :return: Tuple to put into ``choices``
+    """
+    result = tuple((s.value, s.name.title()) for s in source)
+    return result

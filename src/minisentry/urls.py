@@ -14,7 +14,7 @@ urlpatterns = [
     path("sentry/", projects.DashboardView.as_view(), name="dashboard"),
     path("sentry/<project_id>/", projects.ProjectView.as_view(), name="project"),
     path("sentry/<project_id>/events/", events.EventsListView.as_view(), name="events-list"),
-    path("sentry/<project_id>/events/<event_id>/", events.EventView.as_view(), name="events"),
+    path("sentry/<project_id>/events/<event_id>/", events.EventView.as_view(), name="event"),
     path("api/<project_id>/store/", api.store, name="store"),
 ]
 
