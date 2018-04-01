@@ -1,5 +1,6 @@
 import logging
 from enum import Enum
+from typing import Optional
 
 from django.db import models
 
@@ -37,6 +38,12 @@ class Project(models.Model):
             project_id=self.pk,
         )
         return result
+
+    @property
+    def last_group(self) -> Optional['Group']:
+        if not hasattr(self, "_last_group"):
+            setattr(self, "_last_group", self.group_set.last())
+        return getattr(self, "_last_group", None)
 
     def __str__(self):
         return f"id={self.pk}, {self.title}"

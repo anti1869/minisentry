@@ -8,14 +8,28 @@
   <thead>
     <tr>
       <th scope="col">ID</th>
-      <th scope="col" width="100%">Title</th>
+      <th scope="col">Title</th>
+      <th scope="col">Last exception</th>
+      <th scope="col">Events</th>
     </tr>
   </thead>
   <tbody>
-    {% for item in projects_menu %}
+    {% for item in projects %}
       <tr>
         <th scope="row">{{ item.id }}</th>
-        <td><a href="{{ item.url }}">{{ item.title }}</a></td>
+        <td><a href="{% url 'groups-list' project_id=item.pk %}">{{ item.title }}</a></td>
+        <td>
+          <small>
+            {% if item.last_group %}
+              <span class="mr-1 badge badge-{{ item.last_group.level_label }}">{{ item.last_group.times_seen }}</span>
+              <a href="{% url 'group' project_id=item.pk group_id=item.last_group.long_id %}"><b>{{ item.last_group.type_exc.0 }}</b>: {{ item.last_group.type_exc.1 }}</a>
+              <div class="text-muted">{{ item.last_group.last_seen|date:"d b h:i:s" }}</div>
+            {% else %}
+              <div class="text-muted">No events registered yet</div>
+            {% endif %}
+          </small>
+        </td>
+        <td>{{ item.event_count }}</td>
       </tr>
     {% endfor %}
   </tbody>
