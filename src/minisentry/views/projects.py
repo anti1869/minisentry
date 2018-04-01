@@ -18,7 +18,7 @@ class BaseView(LoginRequiredMixin, TemplateView):
 
     def get_projects_menu(self) -> List[Dict]:
         projects = (
-            (pk, title, reverse("events-list", kwargs={"project_id": pk}))
+            (pk, title, reverse("groups-list", kwargs={"project_id": pk}))
             for title, pk in Project.objects.values_list("title", "pk").order_by("title").iterator()
         )
         data = [

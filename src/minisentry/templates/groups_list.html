@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Events of {{ selected_project.title }}{% endblock %}
+
+
+{% block h1 %}
+  <h1>Events of {{ selected_project.title }}</h1>
+{% endblock %}
+
+
+{% block content %}
+  <table class="table">
+  <thead>
+    <tr>
+      <th scope="col" nowrap="nowrap">Last seen</th>
+      <th scope="col">Num</th>
+      <th scope="col" width="100%">Exception</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in groups %}
+      <tr>
+        <th scope="row" nowrap="nowrap">{{ item.last_seen|date:"d b h:i:s" }}</th>
+        <td>{{ item.times_seen }}</td>
+        <td>{{ item.level }} <a href="{% url 'group' project_id=selected_project.pk group_id=item.long_id %}">{{ item.message }}</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+
+
+  <nav aria-label="Page navigation example">
+      <ul class="pagination">
+          {% if groups.has_previous %}
+              <li class="page-item"><a class="page-link" href="./?page=1">first</a></li>
+              <li class="page-item"><a class="page-link" href="./?page={{ groups.previous_page_number }}">&laquo; previous</a></li>
+          {% endif %}
+
+          <li class="page-item active">
+            <span class="page-link">Page {{ groups.number }} of {{ groups.paginator.num_pages }}</span>
+          </li>
+
+          {% if groups.has_next %}
+              <li class="page-item"><a class="page-link" href="./?page={{ groups.next_page_number }}">&raquo; next</a></li>
+              <li class="page-item"><a class="page-link" href="./?page={{ groups.paginator.num_pages }}">last</a></li>
+
+          {% endif %}
+      </ul>
+  </nav>
+{% endblock %}
+
+{% block additional_tab %}
+  <h4>Projects:</h4>
+  <ul>
+    {% for item in projects_menu %}
+      <li>
+        {% if item.hit %}
+          <span class="text-muted">{{ item.title }}</span>
+        {% else %}
+          <a href="{{ item.url }}">{{ item.title }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

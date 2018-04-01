@@ -65,6 +65,7 @@ class Group(models.Model):
 
     class Meta:
         index_together = (("project", "last_seen"), )
+        ordering = ["-last_seen"]
         
     def last_event(self) -> "Event":
         return self.event_set.latest("timestamp")
