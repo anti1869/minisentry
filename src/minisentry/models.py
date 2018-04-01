@@ -52,6 +52,10 @@ class EventFeaturesMixin(object):
     def level_title(self):
         return LOG_LEVELS.get(getattr(self, "level"), "")
 
+    @property
+    def type_exc(self):
+        return getattr(self, "message").split(": ", maxsplit=1)
+
 
 class Group(EventFeaturesMixin, models.Model):
     """
