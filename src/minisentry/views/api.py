@@ -1,14 +1,13 @@
-import json
 import logging
 import uuid
-from copy import deepcopy
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
 from django.db.models import F
 
 from minisentry import helpers
+from minisentry.email import send_group_created_email
 from minisentry.models import Event, Group, Project, GroupStatus
 
 
@@ -32,9 +31,11 @@ def store(request, project_id):
 
     content_encoding = request.META.get("HTTP_CONTENT_ENCODING")
     data = _decode_data(request.body, content_encoding)
-    group = _save_group(data, project_id)
-    _save_event(data, project_id, group)
+    group_id, group_created = _save_group(data, project_id)
+    _save_event(data, project_id, group_id)
     logger.info("Event saved")
+    if group_created:
+        send_group_created_email(group_id)
 
     result = {"id": data.get("event_id")}
     return JsonResponse(result)
@@ -81,8 +82,11 @@ def _get_project_id_from_auth(auth_header: str, requested_id: int) -> Optional[i
     return project_id
 
 
-def _save_group(data: Dict, project_id: int) -> str:
-    """Save event group to database and return long_id of the group"""
+def _save_group(data: Dict, project_id: int) -> Tuple[str, bool]:
+    """
+    Save event group to database and return tuple with long_id of the group
+    and whether group was just created.
+    """
     long_id = _get_group_id(data, project_id)
     updated = (
         Group.objects
@@ -101,7 +105,7 @@ def _save_group(data: Dict, project_id: int) -> str:
             message=data["message"],
             platform=data["platform"],
         )
-    return long_id
+    return long_id, not bool(updated)
 
 
 def _save_event(data: Dict, project_id: int, group_id: str):

@@ -1,0 +1,28 @@
+<html>
+<head>
+  <title>New alert from {{ project.title }}</title>
+</head>
+<body>
+<h1>New alert from {{ project.title }}</h1>
+<p>{{ group.last_seen }}</p>
+<h2>[{{ group.level_title }}] {{ group.type_exc.0 }}</h2>
+<p>{{ group.message }}</p>
+{# TODO: Correct hostname #}
+<p><a href="http://localhost:9002{% url 'group' project_id=project.pk group_id=group.long_id %}">View on MiniSentry</a></p>
+<h2>Traceback:</h2>
+{% if not data.exception %}
+  <p>This exception has no traceback information.</p>
+{% else %}
+  {% for value in data.exception.values %}
+    {% for frame in value.stacktrace.frames %}
+      <div style="margin-bottom: 7px; {% if frame.in_app %}font-weight: bold{% endif %}">
+        <div><small>{{ frame.filename }} in {{ frame.function }} at line {{ frame.lineno }}</small></div>
+        <div><small><pre>{{ frame.context_line }}</pre></small></div>
+      </div>
+    {% endfor %}
+  {% endfor %}
+{% endif %}
+<hr />
+<p><small>You received this notification, because youset up an account in MiniSentry.<br />Unsubscribe in your MiniSentry installation admin.</small></p>
+</body>
+</html>
