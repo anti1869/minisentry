@@ -43,7 +43,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -71,17 +71,31 @@ WSGI_APPLICATION = 'minisentry.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(ROOT_DIR, 'db.sqlite3'),
+db_settings = {
+    "sqlite": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.expanduser(os.environ.get("DB_NAME", "~/minisentry.sqlite3")),
     },
-    # "default": {
-    #     "ENGINE": "django.db.backends.postgresql_psycopg2",
-    #     "NAME": "minisentry",
-    # }
+    "postgresql": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+    },
+    "mysql": {
+        "ENGINE": "django.db.backends.mysql",
+    }
+}
+db_common = {
+    "NAME": os.environ.get("DB_NAME", "minisentry"),
+    "USER": os.environ.get("DB_USER", ""),
+    "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+    "HOST": os.environ.get("DB_HOST", ""),
+    "PORT": os.environ.get("DB_PORT", ""),
+}
+db_settings["postgresql"].update(db_common)
+db_settings["mysql"].update(db_common)
+
+DB_ENGINE = os.environ.get("DB_ENGINE", "sqlite")
+DATABASES = {
+    "default": db_settings[DB_ENGINE],
 }
 
 

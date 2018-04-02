@@ -3,6 +3,7 @@ import uuid
 from typing import Dict, Optional, Tuple
 
 from django.http import JsonResponse, HttpResponseForbidden
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.db.models import F
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @require_POST
+@csrf_exempt
 @transaction.atomic
 def store(request, project_id):
     """
