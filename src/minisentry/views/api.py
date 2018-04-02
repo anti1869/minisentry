@@ -1,5 +1,6 @@
 import json
 import logging
+import uuid
 from copy import deepcopy
 from typing import Dict, Optional
 
@@ -115,10 +116,14 @@ def _save_event(data: Dict, project_id: int, group_id: str):
     Event.objects.create(**kwargs)
 
 
-def _get_group_id(data: Dict, project_id) -> Optional[str]:
+def _get_group_id(data: Dict, project_id) -> str:
     """Generate group_id to group same events"""
     # TODO: Slow as hell. Make it faster
     # TODO: Not tested at all, have no idea if it works.
+    if "exception" not in data:
+        logger.info("No exception data, using UUID for group_id")
+        return str(uuid.uuid4())
+
     try:
         exc = deepcopy(data["exception"])
         for value in exc["values"]:
@@ -126,6 +131,6 @@ def _get_group_id(data: Dict, project_id) -> Optional[str]:
                 frame.pop("vars")
         exception = json.dumps({"e": exc, "pid": project_id}, sort_keys=True)
     except (KeyError, ValueError):
-        logger.error("Can't serialize exception", exc_info=True)
-        return
+        logger.error("Can't serialize exception, using UUID for group_id", exc_info=True)
+        return str(uuid.uuid4())
     return helpers.hash_string(exception)

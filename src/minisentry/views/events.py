@@ -29,7 +29,7 @@ class GroupsListView(BaseView):
         return int(self.request.GET.get("page", 1))
 
     def get_groups_list(self, project: Project):
-        qs = Group.objects.filter(project=project)
+        qs = Group.objects.filter(project=project).order_by("-last_seen")
         paginator = Paginator(qs, self.PER_PAGE)
         groups_list = paginator.get_page(self.requested_page)
         return groups_list

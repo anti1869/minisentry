@@ -87,7 +87,7 @@ class Group(EventFeaturesMixin, models.Model):
 
     class Meta:
         index_together = (("project", "last_seen"), )
-        ordering = ["-last_seen"]
+        ordering = ["last_seen"]
         
     def get_last_event(self) -> "Event":
         return self.event_set.latest("timestamp")
@@ -110,7 +110,7 @@ class Event(EventFeaturesMixin, models.Model):
     class Meta:
         unique_together = (('project', 'event_id'),)
         index_together = (('group', 'timestamp'),)
-        ordering = ["-timestamp"]
+        ordering = ["timestamp"]
 
     @property
     def decoded_data(self):

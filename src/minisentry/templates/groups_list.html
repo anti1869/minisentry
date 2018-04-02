@@ -21,9 +21,9 @@
   <tbody>
     {% for item in groups %}
       <tr>
-        <th scope="row" nowrap="nowrap">{{ item.last_seen|date:"d b h:i:s" }}</th>
+        <th scope="row" nowrap="nowrap">{{ item.last_seen|date:"d b H:i:s" }}</th>
         <td><span class="mr-1 badge badge-{{ item.level_label }}">{{ item.times_seen }}</span></td>
-        <td><a href="{% url 'group' project_id=selected_project.pk group_id=item.long_id %}"><b>{{ item.type_exc.0 }}</b>: {{ item.type_exc.1 }}</a></td>
+        <td><a href="{% url 'group' project_id=selected_project.pk group_id=item.long_id %}"><b>{{ item.type_exc.0 }}</b>{{ item.type_exc.1|yesno:": ," }}{{ item.type_exc.1 }}</a></td>
       </tr>
     {% endfor %}
   </tbody>

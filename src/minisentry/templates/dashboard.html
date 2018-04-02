@@ -23,7 +23,7 @@
             {% if item.last_group %}
               <span class="mr-1 badge badge-{{ item.last_group.level_label }}">{{ item.last_group.times_seen }}</span>
               <a href="{% url 'group' project_id=item.pk group_id=item.last_group.long_id %}"><b>{{ item.last_group.type_exc.0 }}</b>: {{ item.last_group.type_exc.1 }}</a>
-              <div class="text-muted">{{ item.last_group.last_seen|date:"d b h:i:s" }}</div>
+              <div class="text-muted">{{ item.last_group.last_seen|date:"d b H:i:s" }}</div>
             {% else %}
               <div class="text-muted">No events registered yet</div>
             {% endif %}
