@@ -29,6 +29,7 @@ def send_group_created_email(group_id: str):
         "project": group.project,
         "group": group,
         "data": last_event.decoded_data,
+        "url_prefix": settings.MINISENTRY_URL_PREFIX,
     }
     template = loader.get_template("emails/group_created.html")
     html_message = template.render(ctx)

@@ -24,19 +24,19 @@ logger = logging.getLogger(__name__)
 
 
 def run_mule():
+    """Enter mule loop. Receive tasks and executes them"""
     if not UWSGI:
         logger.error("You must be within uwsgi to run mule")
         return
 
     while True:
         logger.info("Mule running, Waiting for messages..")
-
         data = uwsgi.mule_get_msg()
-        print(data)
         execute_task(data)
 
 
 def dummy_task(**kwargs):
+    """Use this one for testing mule"""
     print("Hi! I'm dummy! My kwargs are: %s", kwargs)
     return True
 

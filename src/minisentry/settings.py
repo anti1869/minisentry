@@ -200,3 +200,5 @@ MINISENTRY_WEB_MULE_COUNT = int(os.environ.get("MINISENTRY_WEB_MULE_COUNT", 2))
 
 # Misc
 MULE_SCRIPT_PATH = os.path.join(os.path.dirname(__file__), "mule.py")
+MINISENTRY_URL_PREFIX = os.environ.get("MINISENTRY_URL_PREFIX", "http://localhost:8000")
+MINISENTRY_URL_SCHEMA, MINISENTRY_URL_HOST = MINISENTRY_URL_PREFIX.split("://")

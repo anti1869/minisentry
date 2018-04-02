@@ -7,7 +7,6 @@ from django.views.decorators.http import require_POST
 from django.db.models import F
 
 from minisentry import helpers
-from minisentry.email import send_group_created_email
 from minisentry.models import Event, Group, Project, GroupStatus
 from minisentry.mule import send_task
 
@@ -35,8 +34,8 @@ def store(request, project_id):
     group_id, group_created = _save_group(data, project_id)
     _save_event(data, project_id, group_id)
     logger.info("Event saved")
-    if group_created:
-        send_task("send_group_created_email", group_id=group_id)
+    # if group_created:
+    send_task("send_group_created_email", group_id=group_id)
 
     result = {"id": data.get("event_id")}
     return JsonResponse(result)
@@ -123,7 +122,7 @@ def _save_event(data: Dict, project_id: int, group_id: str):
 
 def _get_group_id(data: Dict, project_id) -> str:
     """Generate group_id to group same events"""
-    # TODO: Not tested at all, have no idea if it works.
+    # TODO: Not tested at all, have no idea if it works in all situations.
 
     extra = data.get("extra", {})
     key = f'{project_id}-{data.get("message", "")}-{data.get("level","")}-' \

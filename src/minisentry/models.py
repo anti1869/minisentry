@@ -2,6 +2,7 @@ import logging
 from enum import Enum
 from typing import Optional
 
+from django.conf import settings
 from django.db import models
 
 from minisentry.constants import LOG_LEVELS, LEVEL_LABELS
@@ -29,12 +30,11 @@ class Project(models.Model):
     secret = models.CharField(default=gen_secret, max_length=34)
 
     def get_dsn(self) -> str:
-        # TODO: Extract real schema and host
         result = "{schema}://{key}:{secret}@{host}/{project_id}".format(
-            schema="http",
+            schema=settings.MINISENTRY_URL_SCHEMA,
             key=self.key,
             secret=self.secret,
-            host="localhost:8000",
+            host=settings.MINISENTRY_URL_HOST,
             project_id=self.pk,
         )
         return result
