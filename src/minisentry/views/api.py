@@ -4,17 +4,19 @@ from typing import Dict, Optional, Tuple
 
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
+from django.db import transaction
 from django.db.models import F
 
 from minisentry import helpers
 from minisentry.models import Event, Group, Project, GroupStatus
-from minisentry.mule import send_task
+from minisentry.mule import delay_task, send_delayed_tasks
 
 
 logger = logging.getLogger(__name__)
 
 
 @require_POST
+@transaction.atomic
 def store(request, project_id):
     """
     Process incoming event.
@@ -34,10 +36,11 @@ def store(request, project_id):
     group_id, group_created = _save_group(data, project_id)
     _save_event(data, project_id, group_id)
     logger.info("Event saved")
-    # if group_created:
-    send_task("send_group_created_email", group_id=group_id)
+    if group_created:
+        delay_task("send_group_created_email", group_id=group_id)
 
     result = {"id": data.get("event_id")}
+    transaction.on_commit(send_delayed_tasks)
     return JsonResponse(result)
 
 

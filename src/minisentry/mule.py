@@ -72,5 +72,20 @@ def execute_task(data):
     logger.info("Task finished with result=`%s`", result)
 
 
+delayed_tasks = []
+
+
+def delay_task(name, **kwargs):
+    """Execute task later (use from transaction blocks)"""
+    delayed_tasks.append((name, kwargs))
+
+
+def send_delayed_tasks():
+    """Send all delayed tasks to mules. Use this in on_commit hook"""
+    for name, kwargs in delayed_tasks:
+        send_task(name, **kwargs)
+    delayed_tasks.clear()
+
+
 if __name__ == "__main__":
     run_mule()
