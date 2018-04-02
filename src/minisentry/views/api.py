@@ -118,19 +118,36 @@ def _save_event(data: Dict, project_id: int, group_id: str):
 
 def _get_group_id(data: Dict, project_id) -> str:
     """Generate group_id to group same events"""
-    # TODO: Slow as hell. Make it faster
     # TODO: Not tested at all, have no idea if it works.
-    if "exception" not in data:
-        logger.info("No exception data, using UUID for group_id")
-        return str(uuid.uuid4())
 
-    try:
-        exc = deepcopy(data["exception"])
-        for value in exc["values"]:
-            for frame in value["stacktrace"]["frames"]:
-                frame.pop("vars")
-        exception = json.dumps({"e": exc, "pid": project_id}, sort_keys=True)
-    except (KeyError, ValueError):
-        logger.error("Can't serialize exception, using UUID for group_id", exc_info=True)
+    extra = data.get("extra", {})
+    key = f'{project_id}-{data.get("message", "")}-{data.get("level","")}-' \
+          f'{str(extra.get("sys.argv", ""))}-' \
+          f'{extra.get("pathname", "")}-' \
+          f'{extra.get("lineno")}-'
+
+    frame = _get_inapp_frame(data)
+    if frame:
+        key += f'{frame.get("abs_path")}-{frame.get("lineno")}-{frame.get("function")}-' \
+                f'{frame.get("module")}-{frame.get("context_line")}-'
+
+    if not key:
+        logger.error("Can't make key from exception data, using UUID for group_id", exc_info=True)
         return str(uuid.uuid4())
-    return helpers.hash_string(exception)
+    return helpers.hash_string(key)
+
+
+def _get_inapp_frame(data: Dict) -> Optional[Dict]:
+    """
+    Get traceback frame, which represents 'in app' property,
+    or single one, if there is only one frame at all.
+    Note: only first value is used.
+    """
+    if "exception" not in data:
+        return
+    for value in data["exception"]["values"]:
+        if len(value["stacktrace"]["frames"]) == 1:
+            return value["stacktrace"]["frames"][0]
+        for frame in value["stacktrace"]["frames"]:
+            if frame.get("in_app", False):
+                return frame
