@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 import sys
 
-if sys.version_info < (3, 5):
-    raise Exception("This package requires Python 3.5 or higher.")
+if sys.version_info < (3, 6):
+    raise Exception("This package requires Python 3.6 or higher.")
 
 
 PACKAGE_NAME = "minisentry"
@@ -61,5 +61,10 @@ setup(
     },
     scripts=[
         "src/manage.py",
-    ]
+    ],
+    entry_points={
+        "console_scripts": [
+            "minisentry = minisentry.__main__:main",
+        ],
+    }
 )

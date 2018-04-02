@@ -1,7 +1,8 @@
 import os
 
 from dotenv import load_dotenv
-import silk
+
+from django.contrib import admin
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -125,6 +126,8 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
+STATIC_DIR_MINISENTRY = os.path.join(os.path.dirname(__file__), "static", "minisentry")
+STATIC_DIR_ADMIN = os.path.join(os.path.dirname(admin.__file__), "static", "admin")
 
 
 # Logging
@@ -185,3 +188,11 @@ EMAIL_PORT = os.environ.get("EMAIL_PORT", "25")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "False") == "True"
+
+# Web server options
+MINISENTRY_WEB_HOST = os.environ.get("MINISENTRY_WEB_HOST", "0.0.0.0")
+MINISENTRY_WEB_PORT = os.environ.get("MINISENTRY_WEB_PORT", 9000)
+MINISENTRY_WEB_STATS_ENABLE = os.environ.get("MINISENTRY_WEB_STATS_ENABLE", "True") == "True"
+MINISENTRY_WEB_STATS_HOST = os.environ.get("MINISENTRY_WEB_STATS_HOST", "127.0.0.1")
+MINISENTRY_WEB_STATS_PORT = os.environ.get("MINISENTRY_WEB_STATS_PORT", 9191)
+MINISENTRY_WEB_SERVE_STATIC = os.environ.get("MINISENTRY_WEB_SERVE_STATIC", "True") == "True"
