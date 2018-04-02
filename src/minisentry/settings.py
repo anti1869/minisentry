@@ -6,15 +6,10 @@ from django.contrib import admin
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROOT_DIR = os.path.dirname(BASE_DIR)
 
-dotenv_path = os.path.join(ROOT_DIR, ".env")
+dotenv_path = os.path.expanduser(os.environ.get("MINISENTRY_ENV_PATH", "~/.minisentry.env"))
 if os.path.isfile(dotenv_path):
     load_dotenv(dotenv_path)
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', '29z71y^5lks9!qy-nnlycry0wze*@9uv(3o37awo^2ar#il6=q')

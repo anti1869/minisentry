@@ -63,6 +63,10 @@ class EventFeaturesMixin(object):
     def type_exc(self):
         return getattr(self, "message").split(": ", maxsplit=1)
 
+    @property
+    def type_title(self):
+        return self.type_exc[0]
+
 
 class Group(EventFeaturesMixin, models.Model):
     """
@@ -91,6 +95,9 @@ class Group(EventFeaturesMixin, models.Model):
         
     def get_last_event(self) -> "Event":
         return self.event_set.latest("timestamp")
+
+    def __str__(self):
+        return f"{self.first_seen} {self.type_title}"
 
 
 class Event(EventFeaturesMixin, models.Model):
