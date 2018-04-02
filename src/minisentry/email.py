@@ -1,15 +1,9 @@
 import logging
-from smtplib import SMTPException
 
 from django.contrib.auth.models import User
 from django.core.mail import get_connection, EmailMultiAlternatives
 from django.conf import settings
-from django.db.models import F, Func, Q
-from django.db.models.functions import Least, Greatest
 from django.template import loader
-from django.utils.timezone import now
-from django.urls import reverse_lazy
-
 
 from minisentry.models import Group, Event
 

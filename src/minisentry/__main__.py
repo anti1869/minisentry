@@ -118,12 +118,11 @@ def main():
             "--static-map", f"/static/admin={settings.STATIC_DIR_ADMIN}",
         )
 
+    args += (f"--mule={settings.MULE_SCRIPT_PATH}", ) * settings.MINISENTRY_WEB_MULE_COUNT
+
     prepare_environment(options)
     os.execvp("uwsgi", args)
 
 
 if __name__ == "__main__":
     main()
-
-
-# uwsgi --chdir /Users/anti1869/Sites/minisentry/src --http :9002 --wsgi-file minisentry/wsgi.py --master --processes 4 --stats 127.0.0.1:9191 --env DJANGO_SETTINGS_MODULE=minisentry.settings --enable-threads

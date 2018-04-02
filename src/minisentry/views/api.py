@@ -9,6 +9,7 @@ from django.db.models import F
 from minisentry import helpers
 from minisentry.email import send_group_created_email
 from minisentry.models import Event, Group, Project, GroupStatus
+from minisentry.mule import send_task
 
 
 logger = logging.getLogger(__name__)
@@ -35,7 +36,7 @@ def store(request, project_id):
     _save_event(data, project_id, group_id)
     logger.info("Event saved")
     if group_created:
-        send_group_created_email(group_id)
+        send_task("send_group_created_email", group_id=group_id)
 
     result = {"id": data.get("event_id")}
     return JsonResponse(result)

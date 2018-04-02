@@ -1,0 +1,76 @@
+"""
+Uwsgi mule is used for simple offloading long running tasks.
+"""
+import django
+from django.apps import apps
+from django.conf import settings
+
+if not apps.ready and not settings.configured:
+    django.setup()
+
+import logging
+
+try:
+    import uwsgi
+    UWSGI = True
+except ImportError:
+    UWSGI = False
+
+from minisentry.email import send_group_created_email
+from minisentry.helpers import convert_to_json, safely_load_json_string
+
+
+logger = logging.getLogger(__name__)
+
+
+def run_mule():
+    if not UWSGI:
+        logger.error("You must be within uwsgi to run mule")
+        return
+
+    while True:
+        logger.info("Mule running, Waiting for messages..")
+
+        data = uwsgi.mule_get_msg()
+        print(data)
+        execute_task(data)
+
+
+def dummy_task(**kwargs):
+    print("Hi! I'm dummy! My kwargs are: %s", kwargs)
+    return True
+
+
+# TODO: Use lazy loading
+TASKS = {
+    "send_group_created_email": send_group_created_email,
+    "test_dummy": dummy_task,
+}
+
+
+def send_task(name, **kwargs):
+    """Serialize task data and send to mule."""
+    if not UWSGI:
+        logger.warning("Not running within uwsgi. Task `%s` aborted", name)
+    kwargs["__task_name"] = name
+    data = convert_to_json(kwargs)
+    uwsgi.mule_msg(data)
+
+
+def execute_task(data):
+    """
+    Deserialize data for task and execute it.
+    This one is happening within mule.
+    """
+    task_data = safely_load_json_string(data)
+    task_name = task_data.pop("__task_name")
+    f = TASKS.get(task_name)
+    if not f:
+        logger.error("Can not find task with name=`%s`", task_name)
+    logger.info("Executing task name=`%s`", task_name)
+    result = f(**task_data)
+    logger.info("Task finished with result=`%s`", result)
+
+
+if __name__ == "__main__":
+    run_mule()
