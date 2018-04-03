@@ -101,7 +101,7 @@ def main():
     # Required arguments that should not be overridden
     options["master"] = True
     options["enable-threads"] = True
-    options["lazy-apps"] = True
+    options["lazy-apps"] = False  # Otherwise signals will be delivered to all workers
     options["single-interpreter"] = True
     
     # Enable or not stats server
