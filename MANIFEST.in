@@ -1,3 +1,4 @@
 include README.rst
 include LICENSE
-recursive-include src/templates *
+recursive-include src/minisentry/templates *
+recursive-include src/minisentry/static *

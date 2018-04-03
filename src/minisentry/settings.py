@@ -151,13 +151,6 @@ LOGGING = {
             "format": "%(levelname)s %(asctime)s %(name)s %(message)s",
             'datefmt': "%d.%m.%Y %H:%M:%S",
         },
-        "colored": {
-            "()": "colorlog.ColoredFormatter",
-            "format":
-                "%(log_color)s%(levelname)-8s%(reset)s %(blue)s[%(asctime)s %(name)s:%(lineno)s] "
-                "%(white)s%(message)s",
-            "datefmt": "%H:%M:%S",
-        },
     },
     "handlers": {
         "console": {
@@ -178,6 +171,15 @@ LOGGING = {
         },
     },
 }
+
+if DEBUG:
+    LOGGING["formatters"]["colored"] = {
+        "()": "colorlog.ColoredFormatter",
+        "format":
+            "%(log_color)s%(levelname)-8s%(reset)s %(blue)s[%(asctime)s %(name)s:%(lineno)s] "
+            "%(white)s%(message)s",
+        "datefmt": "%H:%M:%S",
+    }
 
 
 LOGIN_URL = "/signin/"
