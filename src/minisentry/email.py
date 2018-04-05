@@ -1,4 +1,5 @@
 import logging
+import re
 
 from django.contrib.auth.models import User
 from django.core.mail import get_connection, EmailMultiAlternatives
@@ -9,6 +10,10 @@ from minisentry.models import Group, Event
 
 
 logger = logging.getLogger(__name__)
+
+
+SUBJECT_MAX_LENGTH = 65
+SUBJECT_DATE_FORMAT = "%H:%M, %d %b"
 
 
 def send_group_created_email(group_id: str):
@@ -22,7 +27,13 @@ def send_group_created_email(group_id: str):
     last_event = group.get_last_event()
     emails = User.objects.filter(email__isnull=False).values_list("email", flat=True)
 
-    subject = f"[MiniSentry] [{group.project.title}] {group.last_seen} {group.type_exc[0]}"
+    last_seen_formatted = group.last_seen.strftime(SUBJECT_DATE_FORMAT)
+    subject = re.sub(
+        "\r?\n", " ",
+        f"[MiniSentry] [{group.project.title}] {last_seen_formatted} {group.type_exc[0]}"
+    )
+    if len(subject) > 65:
+        subject = f"{subject[0:62]}..."
 
     # Prepare message body
     ctx = {
