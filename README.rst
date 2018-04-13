@@ -4,6 +4,14 @@ MiniSentry. Cheap Sentry replacement for development
 Sentry is too resource heavy for tiny tasks. If all you need is just to receive
 limited amount of exceptions and have basic aggregation, you can try this.
 
+.. raw:: html
+
+   <p align="center">
+     <img src="https://github.com/anti1869/minisentry/raw/master/images/screenshot-1.png" height="177">
+     <img src="https://github.com/anti1869/minisentry/raw/master/images/screenshot-2.png" height="177">
+     <img src="https://github.com/anti1869/minisentry/raw/master/images/screenshot-3.png" height="177">
+   </p>
+
 This is hardly more than my weekend project. You can use it in development,
 or (if you're brave enough) even in you pet projects. But for sure not on
 any kind of serious production.
@@ -31,47 +39,44 @@ Requirements:
 Deployment:
 -----------
 
-1. Create virtualenv and install this app
+1. Create virtualenv and install this app::
 
-```
-pip install minisentry
-```
+    pip install minisentry
 
-2. Create `.env`-config file, or use defaults (see configuration).
-To pick up `.env`-file you need to export path to it
+2. Create `.env`-config file, or use defaults (see configuration). To pick up `.env`-file you need to export path to it
 
-3. Run migrations
+3. Run migrations::
 
-```manage.py migrate```
+    manage.py migrate
 
-4. Create superuser
+4. Create superuser::
 
-```manage.py createsuperuser```
+    manage.py createsuperuser
 
-5. Run it.
+5. Run it::
 
-```minisentry```
+    minisentry
 
-Embedded uwsgi server will be started and you can access interface at (e.g.):
+Embedded uwsgi server will be started and you can access interface at (e.g.)::
 
-```http://localhost:9000```
+    http://localhost:9000
 
 Daemonization is up to you. I prefer `systemd`. `supervisord` will also work.
 
 6. Go to admin interface and add some projects. You will get project DSN string
-in admin. Getting it in browser is not implemented yet.
+in admin. Getting it in browser is not implemented yet::
 
-```http://localhost:9000/admin/```
+    http://localhost:9000/admin/
 
 
 Upgrading:
 ----------
 
-```
-pip install -U minisentry
-manage.py migrate
-service minisentry restart (in case of systemd)
-```
+.. sourcecode:: bash
+
+    pip install -U minisentry
+    manage.py migrate
+    service minisentry restart (in case of systemd)
 
 
 Configuration:
@@ -81,9 +86,9 @@ Everything is configured in envvars. You can either use `.env` file to store
 them, or manage environment yourself.
 
 If you want to use `.env`-file, just place values in plain text file and export
-path to it in `MINISENTRY_ENV_PATH`. E.g.:
+path to it in `MINISENTRY_ENV_PATH`. E.g.::
 
-```export MINISENTRY_ENV_PATH=~/minisentry.env```
+    export MINISENTRY_ENV_PATH=~/minisentry.env
 
 Here are list of variables:
 
@@ -97,10 +102,12 @@ Here are list of variables:
 - LOGGING_CONSOLE_FORMATTER: "simple" or "verbose"
 
 Email settings:
+
 - DEFAULT_FROM_EMAIL: `From` field for mails from minisentry
 - EMAIL_HOST/EMAIL_PORT/EMAIL_HOST_USER/EMAIL_HOST_PASSWORD/EMAIL_USE_SSL: Smtp server settings
 
 Server settings:
+
 - MINISENTRY_WEB_HOST/MINISENTRY_WEB_PORT: E.g. "0.0.0.0" and 9000
 - MINISENTRY_WEB_STATS_ENABLE: Will enable uwsgi stats server, accessible by telnet
 - MINISENTRY_WEB_STATS_HOST/MINISENTRY_WEB_STATS_PORT: address for that stats server
@@ -108,6 +115,7 @@ Server settings:
 - MINISENTRY_WEB_MULE_COUNT: Number of processed for offloaded tasks
 
 More stuff:
+
 - MINISENTRY_URL_PREFIX: Full address of your server: E.g. https://minisentry.com:9000
 - KEEP_DATA_FOR_DAYS: How long to keep not updated events
 
@@ -123,6 +131,5 @@ Docker:
 -------
 
 It is TODO. Send me a PR maybe?
-
 
 
