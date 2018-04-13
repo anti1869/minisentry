@@ -43,12 +43,15 @@ setup(
     package_data={},
     license="Proprietary",
     classifiers=[
-        "License :: Proprietary",
+        "License :: OSI Approved :: Apache Software License",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Topic :: Internet :: Log Analysis",
         "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Software Development :: Bug Tracking",
+        "Framework :: Django :: 2.0",
     ],
     install_requires=[
         "django >=2.0, <=2.1",
