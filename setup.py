@@ -6,7 +6,7 @@ if sys.version_info < (3, 6):
 
 
 PACKAGE_NAME = "minisentry"
-VERSION = "0.0.1"
+VERSION = "0.0.2b1"
 QUICK_DESCRIPTION = "MiniSentry. Stripped Sentry replacement for development"
 SOURCE_DIR_NAME = "src"
 

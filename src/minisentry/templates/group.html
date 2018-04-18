@@ -12,41 +12,58 @@
   <p class="lead"><span class="mr-2 badge badge-{{ event.level_label }}">{{ event.level_title }}</span> <strong>{{ event.type_exc.0 }}{{ event.type_exc.1|yesno:": ," }}</strong>{{ event.type_exc.1 }}</p>
 
   <h2>Traceback</h2>
-  {% if not data.exception %}
-    <p>This exception has no traceback information.</p>
-  {% else %}
-    {% for value in data.exception.values %}
-      <div class="list-group mb-4">
-      {% for frame in value.stacktrace.frames %}
-          <div class="list-group-item">
-            <div class="d-flex">
-              <div class=""><div><small><b>{{ frame.filename }}</b> in <b>{{ frame.function }}</b> at line <b>{{ frame.lineno }}</b></small></div></div>
-              <div class="ml-auto"><button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#framecontents-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseExample">+</button></div>
-            </div>
-            <div class="collapse{% if frame.in_app or value.stacktrace.frames|length == 1 %}.show{% endif %}" id="framecontents-{{ forloop.counter }}">
-              <pre><code>{{ frame.pre_context|join:"<br />" }}</code><br /><code class="bg-primary text-light">{{ frame.context_line }}</code><br /><code>{{ frame.post_context|join:"<br />" }}</code></pre>
-              <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#localvars-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseExample">Local vars</button>
-              <div class="mt-3 collapse" id="localvars-{{ forloop.counter }}">
-                <small>
-                  <table class="table">
-                  <tbody>
-                    {% for var, values in frame.vars.items %}
-                      <tr>
-                        <th scope="row">{{ var }}</th>
-                        <td><code>{{ values }}</code></td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                  </table>
-                </small>
+  <nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+      <a class="nav-item nav-link active" id="nav-formatted-tab" data-toggle="tab" href="#nav-formatted" role="tab" aria-controls="nav-formatted" aria-selected="true">Formatted</a>
+      <a class="nav-item nav-link" id="nav-json-tab" data-toggle="tab" href="#nav-json" role="tab" aria-controls="nav-json" aria-selected="false">Raw JSON</a>
+    </div>
+  </nav>
+  <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-formatted" role="tabpanel" aria-labelledby="nav-formatted-tab">
+
+      {% if not data.exception %}
+        <p class="my-3">This exception has no traceback information.</p>
+      {% else %}
+        {% for value in data.exception.values %}
+          <div class="list-group mb-4">
+          {% for frame in value.stacktrace.frames %}
+            <div class="list-group-item">
+              <div class="d-flex">
+                <div class=""><div><small><b>{{ frame.filename }}</b> in <b>{{ frame.function }}</b> at line <b>{{ frame.lineno }}</b></small></div></div>
+                <div class="ml-auto"><button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#framecontents-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseExample">+</button></div>
+              </div>
+              <div class="collapse{% if frame.in_app or value.stacktrace.frames|length == 1 %}.show{% endif %}" id="framecontents-{{ forloop.counter }}">
+                <pre><code>{{ frame.pre_context|join:"<br />" }}</code><br /><code class="bg-primary text-light">{{ frame.context_line }}</code><br /><code>{{ frame.post_context|join:"<br />" }}</code></pre>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#localvars-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseExample">Local vars</button>
+                <div class="mt-3 collapse" id="localvars-{{ forloop.counter }}">
+                  <small>
+                    <table class="table">
+                    <tbody>
+                      {% for var, values in frame.vars.items %}
+                        <tr>
+                          <th scope="row">{{ var }}</th>
+                          <td><code>{{ values }}</code></td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                    </table>
+                  </small>
+                </div>
               </div>
             </div>
+          {% endfor %}
           </div>
-      {% endfor %}
-      </div>
-    {% endfor %}
-  {% endif %}
+        {% endfor %}
+      {% endif %}
 
+    </div>
+    <div class="tab-pane fade" id="nav-json" role="tabpanel" aria-labelledby="nav-json-tab">
+      <textarea style="width: 100%; height: 500px;" class="my-3">{{ event.decoded_data }}</textarea>
+    </div>
+  </div>
+
+
+  {% include "include/table_from_dict.html" with title="Request" values_dict=data.request only %}
   {% include "include/table_from_dict.html" with title="Extra" values_dict=data.extra only %}
   {% include "include/table_from_dict.html" with title="Modules" values_dict=data.modules only %}
   {% include "include/table_from_dict.html" with title="SDK" values_dict=data.sdk only %}
